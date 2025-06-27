@@ -6,7 +6,10 @@ import "@openzeppelin/contracts/access/AccessControl.sol";
 contract Spott is AccessControl {
     bytes32 public constant MODERATOR_ROLE = keccak256("MODERATOR_ROLE");
 
-    constructor(address moderator) {
+    constructor(address _moderator) {
+        // _grantRole(DEFAULT_ADMIN_ROLE, moderator);
+        moderator = _moderator;
+        _grantRole(MODERATOR_ROLE, moderator);
         _grantRole(DEFAULT_ADMIN_ROLE, moderator);
     }
 
@@ -62,6 +65,7 @@ contract Spott is AccessControl {
     uint256 public productCount;
     uint256 public orderCount;
     uint256 public totalVendors;
+    address public moderator;
 
     mapping(uint256 => Product) public products;
     mapping(address => uint256[]) public vendorProducts;
@@ -192,7 +196,12 @@ contract Spott is AccessControl {
         return reputationScores[vendor];
     }
 
+    function getVendor(address vendor) external view returns (Vendor memory ven) {
+        Vendor storage ven = vendors[vendor];
+        return (ven);
+    }
+
     function getOwner() external view returns (address) {
-        return getRoleMember(DEFAULT_ADMIN_ROLE, 0);
+        return moderator;
     }
 }
