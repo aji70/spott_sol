@@ -15,7 +15,7 @@ contract CounterTest is Test {
 
     function test_Register_vendor() public {
         vm.startPrank(vendor);
-        spott.registerVendor("Vendor1", "Location1", "Category1", "metadataUri1", "Bio1", "profileImage1");
+        register_vendor();
         Spott.Vendor memory ven = spott.getVendor(vendor);
         assertEq(ven.id, 1);
         assertEq(ven.owner, vendor);
@@ -30,8 +30,18 @@ contract CounterTest is Test {
         vm.stopPrank();
     }
 
-    //     function testFuzz_SetNumber(uint256 x) public {
-    //         counter.setNumber(x);
-    //         assertEq(counter.number(), x);
-    //     }
+    function test_verify_vendor() public {
+        vm.startPrank(vendor);
+        register_vendor();
+        vm.startPrank(moderator);
+        spott.verifyVendor(vendor);
+        Spott.Vendor memory ven = spott.getVendor(vendor);
+        assertEq(ven.id, 1);
+        assertTrue(ven.verified);
+        vm.stopPrank();
+    }
+
+    function register_vendor() public {
+        spott.registerVendor("Vendor1", "Location1", "Category1", "metadataUri1", "Bio1", "profileImage1");
+    }
 }

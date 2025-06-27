@@ -115,6 +115,11 @@ contract Spott is AccessControl {
     }
 
     function verifyVendor(address vendor) external onlyRole(MODERATOR_ROLE) {
+        require(vendorsWritten[vendor], "Vendor not registered");
+        require(!vendors[vendor].verified, "Vendor already verified");
+        require(vendors[vendor].exists, "Vendor does not exist");
+        require(msg.sender != vendor, "Cannot verify self");
+        require(moderator == msg.sender, "Only moderator can verify");
         vendors[vendor].verified = true;
     }
 
@@ -196,9 +201,9 @@ contract Spott is AccessControl {
         return reputationScores[vendor];
     }
 
-    function getVendor(address vendor) external view returns (Vendor memory ven) {
-        Vendor storage ven = vendors[vendor];
-        return (ven);
+    function getVendor(address vendor) external view returns (Vendor memory ve) {
+        Vendor storage ve = vendors[vendor];
+        return (ve);
     }
 
     function getOwner() external view returns (address) {
