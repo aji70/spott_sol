@@ -3,11 +3,11 @@ pragma solidity ^0.8.24;
 
 import "@openzeppelin/contracts/access/AccessControl.sol";
 
-contract LiveCommerce is AccessControl {
+contract Spott is AccessControl {
     bytes32 public constant MODERATOR_ROLE = keccak256("MODERATOR_ROLE");
 
-    constructor() {
-        _grantRole(DEFAULT_ADMIN_ROLE, msg.sender);
+    constructor(address moderator) {
+        _grantRole(DEFAULT_ADMIN_ROLE, moderator);
     }
 
     struct Product {
@@ -176,13 +176,9 @@ contract LiveCommerce is AccessControl {
         require(order.confirmed, "Not confirmed");
 
         address vendor = products[order.productId].vendor;
-        vendorReviews[vendor].push(Review({
-            reviewer: msg.sender,
-            vendor: vendor,
-            rating: rating,
-            comment: comment,
-            timestamp: block.timestamp
-        }));
+        vendorReviews[vendor].push(
+            Review({reviewer: msg.sender, vendor: vendor, rating: rating, comment: comment, timestamp: block.timestamp})
+        );
 
         reputationScores[vendor] += rating;
         emit ReviewSubmitted(vendor, msg.sender);
@@ -194,5 +190,9 @@ contract LiveCommerce is AccessControl {
 
     function getVendorScore(address vendor) external view returns (uint256) {
         return reputationScores[vendor];
+    }
+
+    function getOwner() external view returns (address) {
+        return getRoleMember(DEFAULT_ADMIN_ROLE, 0);
     }
 }
